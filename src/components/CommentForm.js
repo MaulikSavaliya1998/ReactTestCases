@@ -4,8 +4,24 @@ const CommentForm = ({ setCommets }) => {
   const [text, setText] = useState("");
   const [checked, setChecked] = useState(false);
 
-  const addComment = () => {
-    setCommets((prev) => [...prev, { id: Date.now(), text: text }]);
+  // const addComment = () => {
+  //   setCommets((prev) => [...prev, { id: Date.now(), text: text }]);
+  //   setText("");
+  // };
+
+  const postComment = async () => {
+    const res = await fetch("http://localhost:5000/addcomment", {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        text: text,
+      }),
+    });
+    debugger;
+    const result = await res.json();
+    setCommets((prev) => [...prev, result]);
     setText("");
   };
 
@@ -24,7 +40,7 @@ const CommentForm = ({ setCommets }) => {
         onChange={() => setChecked(!checked)}
       />
       <label htmlFor="checkbox">I agree to terms and conditions.</label>
-      <button disabled={!checked || !text} onClick={addComment}>
+      <button disabled={!checked || !text} onClick={postComment}>
         comment
       </button>
     </div>

@@ -1,4 +1,4 @@
-import { render, screen, logRoles } from "@testing-library/react";
+import { render, screen, logRoles, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import App from "./App";
 
@@ -36,7 +36,8 @@ test("Comment gets displayed after submitting", async () => {
   await userEvent.click(checkbox);
   await userEvent.click(submitButton);
 
-  const commentLi = screen.getByText("First Comment", { exact: false });
+  // const commentLi = screen.getByText("First Comment", { exact: false });
+  const commentLi = await screen.findByText("First Comment", { exact: false });
   expect(commentLi).toBeInTheDocument();
 });
 
@@ -56,12 +57,27 @@ test("Second comment gets displayed after submitting", async () => {
   await userEvent.type(commentInput, "Second Comment");
   await userEvent.click(checkbox);
   await userEvent.click(submitButton);
+  await userEvent.clear(commentInput);
 
   await userEvent.type(commentInput, "Awesome");
   await userEvent.click(submitButton);
 
   // const commentLi = screen.getByText("Second Comment", { exact: false });
   // expect(commentLi).toBeInTheDocument();
-  const commentLi = screen.getAllByRole("listitem");
-  expect(commentLi.length).toBe(2);
+  // const commentLi = screen.getAllByRole("listitem");
+
+  // 2 method
+  await waitFor(() => {
+    const commentLi = screen.getAllByRole("listitem");
+    expect(commentLi.length).toBe(2);
+  });
+
+  // 1 method
+  // const commentLi = await screen.findAllByRole(
+  //   "listitem",
+  //   {},
+  //   { interval: 500, timeout: 2000 }
+  // );
+  // screen.debug();
+  // expect(commentLi.length).toBe(2);
 });
