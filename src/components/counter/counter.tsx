@@ -15,17 +15,16 @@ export function Counter({ description, defaultCount }: CounterProps) {
       <h2>
         DESC: {description} - DC: {defaultCount}
       </h2>
-      {/* <label>
+      <label>
         Incrementor:
         <input
           value={incrementor}
           onChange={(evt) => {
-            setIncrementor(parseInt(evt.target.value) || 1);
+            setIncrementor(parseInt(evt.target.value) || 0);
           }}
           type="number"
         />
-      </label> */}
-      <br />
+      </label>
       <button
         aria-label="Subtract from Counter"
         onClick={() => setCount(count - incrementor)}
