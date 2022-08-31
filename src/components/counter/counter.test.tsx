@@ -1,7 +1,15 @@
+/* eslint-disable jest/expect-expect */
+/* eslint-disable testing-library/prefer-find-by */
 /* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable testing-library/no-render-in-setup */
 import React from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  waitForElementToBeRemoved,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Counter } from "./counter";
 
@@ -20,13 +28,39 @@ describe("Counter", () => {
     });
 
     describe('When the incrementor changes to 5 and "+" button is clicked', () => {
-      beforeEach(() => {
+      beforeEach(async () => {
         userEvent.type(screen.getByLabelText(/Incrementor/), "{selectall}5");
         userEvent.click(screen.getByRole("button", { name: "Add to Counter" }));
+
+        await waitFor(() => screen.getByText("Current Count: 15"));
       });
 
       it('renders "Current Count: 15"', () => {
         expect(screen.getByText("Current Count: 15")).toBeInTheDocument();
+      });
+
+      // Documentation: https://testing-library.com/docs/guide-disappearance/#waiting-for-disappearance
+      it('"I am too small " disappears after 300ms', async () => {
+        await waitForElementToBeRemoved(() =>
+          screen.queryByText("I am too small")
+        );
+      });
+
+      describe('When the incrementor changed to empty string and "+" button is clicked', () => {
+        beforeEach(async () => {
+          userEvent.type(
+            screen.getByLabelText(/Incrementor/),
+            "{selectall}{delete}"
+          );
+          userEvent.click(
+            screen.getByRole("button", { name: "Add to Counter" })
+          );
+
+          await waitFor(() => screen.getByText("Current Count: 16"));
+        });
+        it('Render "Current Count:16"', () => {
+          expect(screen.getByText("Current Count: 16")).toBeInTheDocument();
+        });
       });
     });
     describe('When the incrementor changes to 25 and "-" button is clicked', () => {
@@ -59,8 +93,12 @@ describe("Counter", () => {
       beforeEach(() => {
         fireEvent.click(screen.getByRole("button", { name: "Add to Counter" }));
       });
-      it('Renders "Current Count: 1"', () => {
-        expect(screen.getByText("Current Count: 1")).toBeInTheDocument();
+      it('Renders "Current Count: 1"', async () => {
+        // const label = await screen.findByText('Current Count: 1')
+
+        await waitFor(() =>
+          expect(screen.getByText("Current Count: 1")).toBeInTheDocument()
+        );
       });
     });
 
